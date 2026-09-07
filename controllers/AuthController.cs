@@ -22,9 +22,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        // Temporary admin credentials
-        // We will move these to the database later.
-       if (request.Username != "admin" || request.Password != "admin123")
+        // Hardcoded admin check
+        if (request.Username != "admin" || request.Password != "admin123")
         {
             return Unauthorized(new
             {
@@ -32,33 +31,28 @@ public class AuthController : ControllerBase
             });
         }
 
+        var jwtKey = _configuration["Jwt:Key"] ?? "SUPER_SECRET_FALLBACK_KEY_123456789";
+        var jwtIssuer = _configuration["Jwt:Issuer"] ?? "GamingStoreApi";
+        var jwtAudience = _configuration["Jwt:Audience"] ?? "GamingStoreFrontend";
+
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, request.Username),
             new Claim(ClaimTypes.Role, "Admin")
         };
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"]!
-            )
-        );
-
-        var credentials = new SigningCredentials(
-            key,
-            SecurityAlgorithms.HmacSha256
-        );
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: jwtIssuer,
+            audience: jwtAudience,
             claims: claims,
             expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: credentials
         );
 
-        var tokenString = new JwtSecurityTokenHandler()
-            .WriteToken(token);
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
         return Ok(new
         {

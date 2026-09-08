@@ -42,13 +42,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Enable CORS for React
+// Enable CORS for React (Localhost & Deployed Vercel)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5174")
+            .WithOrigins(
+                "http://localhost:5174",
+                "https://gaming-store-frontend-omega.vercel.app"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -56,14 +59,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Enable Swagger in Development
+// Enable Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
 // Enable CORS
 app.UseCors("AllowReact");
 
-app.UseHttpsRedirection();
+// Disabled to prevent Docker container crashes on Render
+// app.UseHttpsRedirection();
 
 // JWT Authentication
 app.UseAuthentication();

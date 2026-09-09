@@ -48,10 +48,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact", policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:5174",
-                "https://gaming-store-frontend-omega.vercel.app"
-            )
+            .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

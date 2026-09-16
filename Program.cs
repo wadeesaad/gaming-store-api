@@ -13,12 +13,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add database
+// Add PostgreSQL / Neon Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
+{
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+    );
+});
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -42,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Enable CORS for React (Localhost & Deployed Vercel)
+// Enable CORS for React
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
@@ -63,13 +64,14 @@ app.UseSwaggerUI();
 // Enable CORS
 app.UseCors("AllowReact");
 
-// Disabled to prevent Docker container crashes on Render
+// Disabled for Render Docker
 // app.UseHttpsRedirection();
 
 // JWT Authentication
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map Controllers
 app.MapControllers();
 
 app.Run();

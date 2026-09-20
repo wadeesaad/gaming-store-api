@@ -74,8 +74,8 @@ namespace GamingStoreApi.Controllers
                 EndTime = request.EndTime,
                 TotalPrice = request.TotalPrice,
                 Status = "Booked",
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+              CreatedAt = DateTime.UtcNow,
+              UpdatedAt = DateTime.UtcNow
             };
 
             _context.Reservations.Add(reservation);
